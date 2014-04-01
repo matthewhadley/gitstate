@@ -3,11 +3,12 @@ usage()
 {
 cat << EOF
 
-show status of git repos on the filesystem
+Show dirty git repos states under a path
 
 OPTIONS:
-    -q      do not output files
+    -h      show usage info
     -p      path to search
+    -q      do not output files
     -s      no progress spinner
 
 EOF
@@ -38,9 +39,10 @@ spinner()
   done
 }
 
-while getopts "qp:s" option
+while getopts "hqp:s" option
 do
   case $option in
+    h) usage;;
     q) QUIET=1;;
     p) SEARCH_PATH=$OPTARG;;
     s) NO_SPINNER=1;;
@@ -53,7 +55,12 @@ count_clean=0;
 count_dirty=0;
 
 if [ -z "$SEARCH_PATH" ];then
-  SEARCH_PATH='.'
+
+  if [ -z "$1" ];then
+    SEARCH_PATH='.'
+  else
+    SEARCH_PATH="$1"
+  fi
 fi
 
 find_states(){
@@ -77,6 +84,7 @@ find_states(){
         let count_clean=$count_clean+1;
       fi
   done
+  echo -e "\rREPOS:$count_all  DIRTY:$count_dirty  CLEAN:$count_clean";
 }
 
 if [ "$NO_SPINNER" == "1" ];then
@@ -86,5 +94,4 @@ else
   spinner $!
 fi
 
-echo -e "\rREPOS:$count_all  DIRTY:$count_dirty  CLEAN:$count_clean";
 exit 0
