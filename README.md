@@ -2,11 +2,9 @@
 
 Bash script to show dirty git repos states under a path
 
-## Install
+## Usage
 
 Ensure `gitstate` is somewhere in your `$PATH`
-
-## Usage
 
 ```
 $ gitstate -p ./bash
