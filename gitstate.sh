@@ -8,6 +8,7 @@ show status of git repos on the filesystem
 OPTIONS:
     -q      do not output files
     -p      path to search
+    -s      no progress spinner
 
 EOF
 exit 1
@@ -37,11 +38,12 @@ spinner()
   done
 }
 
-while getopts "qp:" option
+while getopts "qp:s" option
 do
   case $option in
     q) QUIET=1;;
     p) SEARCH_PATH=$OPTARG;;
+    s) NO_SPINNER=1;;
     \?) usage;exit 2;;
   esac
 done
@@ -77,7 +79,12 @@ find_states(){
   done
 }
 
-find_states &
-spinner $!
+if [ "$NO_SPINNER" == "1" ];then
+  find_states
+else
+  find_states &
+  spinner $!
+fi
+
 echo -e "\rREPOS:$count_all  DIRTY:$count_dirty  CLEAN:$count_clean";
 exit 0
