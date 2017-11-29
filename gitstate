@@ -55,21 +55,16 @@ count_clean=0;
 count_dirty=0;
 
 if [ -z "$SEARCH_PATH" ];then
-
-  if [ -z "$1" ];then
-    SEARCH_PATH='.'
-  else
-    SEARCH_PATH="$1"
-  fi
+  SEARCH_PATH='.'
 fi
 
 find_states(){
-  for gitdir in `find $SEARCH_PATH -name .git`;
+  find "$SEARCH_PATH" -name .git -type d | while read gitdir
     do
       let count_all=$count_all+1;
       workTree=${gitdir%/*};
 
-      if [[ "$(git --git-dir=$gitdir --work-tree=$workTree status 2> /dev/null | tail -n1 | cut -c 1-17)" != "nothing to commit" ]];then
+      if [[ "$(git --git-dir=\"$gitdir\" --work-tree=\"$workTree\" status 2> /dev/null | tail -n1 | cut -c 1-17)" != "nothing to commit" ]];then
         let count_dirty=$count_dirty+1;
         if [ "$workTree" == "." ];then
           echo -e "\r "
@@ -77,7 +72,7 @@ find_states(){
           echo -e "\r$workTree";
         fi
         if [ "$QUIET" != "1" ];then
-          git --git-dir=$gitdir --work-tree=$workTree status -sb;
+          git --git-dir="$gitdir" --work-tree="$workTree" status -sb;
           echo ""
         fi
       else
