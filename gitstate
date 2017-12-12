@@ -59,12 +59,11 @@ if [ -z "$SEARCH_PATH" ];then
 fi
 
 find_states(){
-  find "$SEARCH_PATH" -name .git -type d | while read gitdir
+   while read gitdir
     do
       let count_all=$count_all+1;
       workTree=${gitdir%/*};
-
-      if [[ "$(git --git-dir=\"$gitdir\" --work-tree=\"$workTree\" status 2> /dev/null | tail -n1 | cut -c 1-17)" != "nothing to commit" ]];then
+      if [[ "$(git --git-dir=$gitdir --work-tree=$workTree status 2> /dev/null | tail -n1 | cut -c 1-17)" != "nothing to commit" ]];then
         let count_dirty=$count_dirty+1;
         if [ "$workTree" == "." ];then
           echo -e "\r "
@@ -78,8 +77,9 @@ find_states(){
       else
         let count_clean=$count_clean+1;
       fi
-  done
-  echo -e "\rREPOS:$count_all  DIRTY:$count_dirty  CLEAN:$count_clean";
+  done < <(find "$SEARCH_PATH" -name .git -type d)
+
+  echo -e "\rREPOS:$count_all  DIRTY:$count_dirty  CLEAN:$count_clean $wat";
 }
 
 if [ "$NO_SPINNER" == "1" ];then
